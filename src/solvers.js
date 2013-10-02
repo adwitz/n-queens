@@ -18,18 +18,21 @@ window.findNRooksSolution = function(n){
   var rookSearch = function(chessboard, rowNum){
     for ( var col = 0; col < n; col++ ){
       var newChessboard = new Board(chessboard.attributes);
-      
       newChessboard.attributes[rowNum][col] = 1;
-      debugger;
-      if (!(chessboard.hasAnyColConflicts && chessboard.hasAnyRowConflicts)) {
-        if (rowNum < n) { rookSearch(newChessboard, rowNum + 1); }
-        else { solutions.push(newChessboard); }
+      if (!(newChessboard.hasAnyColConflicts() && newChessboard.hasAnyRowConflicts())) {
+        rowNum++;
+        if (rowNum < n) { rookSearch(newChessboard, rowNum); }
+        else {
+          solutions.push(newChessboard);
+          return;
+        }
       }
     }
   };
   var start = new Board({n: n});
   rookSearch(start, 0);
   solution = solutions[0];
+  solution = solution.attributes;
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
