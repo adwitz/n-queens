@@ -13,33 +13,70 @@
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
-window.solutionNumbers = {};
 window.findNRooksSolution = function(n){
-  var storage = [];  //all possible chessboards;
+  var aboard = new Board({n:n});
+  aboard = aboard.rows();
+  var breadcrumbs;
   var solutions = [];
-  var rookSearch = function(chessboard, row){
-    if (row === n){
-        solutions.push(chessboard);
-    } else {
-      for (var col = 0; col < n; col++){
-        var newChessboard = new Board(makeArray(chessboard));
-        debugger;
-        newChessboard.attributes[row][col] = 1;
-        var blah = newChessboard.hasAnyColConflicts();
-        var bleh = newChessboard.hasAnyRowConflicts();
-        rookSearch(newChessboard, row+1);
+  var traverse = function(board, rowNum, breadcrumbs){
+    if (rowNum === n){
+      solutions.push(board);
+      return;
+    }
+    for (var col = 0; col < n; col++){
+      if (!(breadcrumbs["col" + col])){
+        var newBoard = copy(board);
+        newBoard[rowNum][col] = 1;
+        newBoard.breadcrumbs = breadcrumbs.clone();
+        newBoard.breadcrumbs["col" + col] = true;
+        traverse(newBoard, rowNum+1, newBoard.breadcrumbs);
       }
     }
   };
-  rookSearch(new Board({n:n}), 0);
-  debugger;
-  return solutions[0].attributes;
+  traverse(aboard, 0, {});
+  return solutions[0];
+};
+
+window.copy = function(arr){
+  var results = [];
+  for (var i=0; i<arr.length; i++){
+    results.push(arr[i].slice(0));
+  }
+  return results;
+};
+
+Object.prototype.clone = function(){
+  var newObj = {};
+  for (var key in this){
+    newObj[key] = this[key];
+  }
+  return newObj;
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n){
+  var aboard = new Board({n:n});
+  aboard = aboard.rows();
+  var breadcrumbs;
+  var solutions = [];
+  var traverse = function(board, rowNum, breadcrumbs){
+    if (rowNum === n){
+      solutions.push(board);
+      return;
+    }
+    for (var col = 0; col < n; col++){
+      if (!(breadcrumbs["col" + col])){
+        var newBoard = copy(board);
+        newBoard[rowNum][col] = 1;
+        newBoard.breadcrumbs = breadcrumbs.clone();
+        newBoard.breadcrumbs["col" + col] = true;
+        traverse(newBoard, rowNum+1, newBoard.breadcrumbs);
+      }
+    }
+  };
+  traverse(aboard, 0, {});
+  return solutions.length;
   // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return ;
 };
 
 window.makeArray = function(chessObj){
