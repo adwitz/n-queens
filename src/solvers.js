@@ -160,6 +160,7 @@ Array.prototype.hasMinorDiagonalConflictAt = function(minorDiagonalColumnIndexAt
       var colIn = minorDiagonalColumnIndexAtFirstRow;
       var length = chessboard.length;
       var count = 0;
+      debugger;
       for ( var row = 0; row < length; row++ ){
         chessboard[row][colIn] && count++;
         colIn--;
