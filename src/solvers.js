@@ -165,7 +165,7 @@ Array.prototype.hasMinorDiagonalConflictAt = function(minorDiagonalColumnIndexAt
         colIn--;
         if (count > 1) { return true; }
       }
-      return false; // fixme
+      return false;
     };
 
     // test if any minor diagonals on this board contain conflicts
@@ -175,7 +175,7 @@ Array.prototype.hasAnyMinorDiagonalConflicts = function(){
       for ( var i=length-1 ; i > -1; i--){
         if(this.hasMinorDiagonalConflictAt(i)) { return true; }
       }
-      return false; // fixme
+      return false;
     };
 
 
@@ -188,20 +188,19 @@ window.countNQueensSolutions = function(n){
   var traverse = function(board, rowNum, breadcrumbs){
     if (rowNum === n){
       if (board.counter()){
-        debugger;
         solutions.push(board);
       }
       return;
     }
     for (var col = 0; col < n; col++){
-      if (!(breadcrumbs["col" + col])){
+      if (!(breadcrumbs["col" + col] || breadcrumbs[col + "" + rowNum])){
         var newBoard = copy(board);
         newBoard[rowNum][col] = 1;
         newBoard.breadcrumbs = breadcrumbs.clone();
         newBoard.breadcrumbs["col" + col] = true;
-        if (!(newBoard.hasAnyMajorDiagonalConflicts() || newBoard.hasAnyMinorDiagonalConflicts())){
-          traverse(newBoard, rowNum+1, newBoard.breadcrumbs);
-        }
+        newBoard.breadcrumbs[(col + 1) + "" + (rowNum + 1)]=true;
+        newBoard.breadcrumbs[(col - 1) + "" + (rowNum + 1)]=true;
+        traverse(newBoard, rowNum+1, newBoard.breadcrumbs);
       }
     }
   };
