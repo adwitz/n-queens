@@ -86,7 +86,7 @@ window.makeArray = function(chessObj){
     array.push(obj[i]);
   }
   return array;
-}
+};
 
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
@@ -95,6 +95,20 @@ window.findNQueensSolution = function(n){
   aboard = aboard.rows();
   var breadcrumbs;
   var solutions = [];
+  var setTrail = function(board, row, col){
+    debugger;
+    board.breadcrumbs["col" + col] = true;
+    var j = row + 1;
+    for (var i = col+1; i < n; i++, j++){
+      board.breadcrumbs[i + "" + j] = true;
+    }
+    j = row + 1;
+    for (i = col-1; i > -1; i--, j++){
+      board.breadcrumbs[i + "" + j] = true;
+    }
+    return board.breadcrumbs;
+  };
+
   var traverse = function(board, rowNum, breadcrumbs){
     if (rowNum === n){
       if (board.counter()){
@@ -103,14 +117,12 @@ window.findNQueensSolution = function(n){
       return;
     }
     for (var col = 0; col < n; col++){
-      if (!(breadcrumbs["col" + col])){
+      if (!(breadcrumbs["col" + col] || breadcrumbs[col + "" + rowNum])){
         var newBoard = copy(board);
         newBoard[rowNum][col] = 1;
         newBoard.breadcrumbs = breadcrumbs.clone();
-        newBoard.breadcrumbs["col" + col] = true;
-        if (!(newBoard.hasAnyMajorDiagonalConflicts() || newBoard.hasAnyMinorDiagonalConflicts())){
-          traverse(newBoard, rowNum+1, newBoard.breadcrumbs);
-        }
+        newBoard.breadcrumbs = setTrail(newBoard, rowNum, col);
+        traverse(newBoard, rowNum+1, newBoard.breadcrumbs);
       }
     }
   };
@@ -185,6 +197,20 @@ window.countNQueensSolutions = function(n){
   aboard = aboard.rows();
   var breadcrumbs;
   var solutions = [];
+  var setTrail = function(board, row, col){
+    board.breadcrumbs["col" + col] = true;
+    var j = row + 1;
+    for (var i = col+1; i < n; i++, j++){
+      board.breadcrumbs[i + "" + j] = true;
+    }
+    j = row + 1;
+    for (i = col-1; i > -1 && j < n; i--, j++){
+      board.breadcrumbs[i + "" + j] = true;
+    }
+    debugger;
+    return board.breadcrumbs;
+  };
+
   var traverse = function(board, rowNum, breadcrumbs){
     if (rowNum === n){
       if (board.counter()){
@@ -197,9 +223,7 @@ window.countNQueensSolutions = function(n){
         var newBoard = copy(board);
         newBoard[rowNum][col] = 1;
         newBoard.breadcrumbs = breadcrumbs.clone();
-        newBoard.breadcrumbs["col" + col] = true;
-        newBoard.breadcrumbs[(col + 1) + "" + (rowNum + 1)]=true;
-        newBoard.breadcrumbs[(col - 1) + "" + (rowNum + 1)]=true;
+        newBoard.breadcrumbs = setTrail(newBoard, rowNum, col);
         traverse(newBoard, rowNum+1, newBoard.breadcrumbs);
       }
     }
